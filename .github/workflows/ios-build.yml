@@ -30,7 +30,7 @@ jobs:
         run: |
           cd ios
           xcodebuild -workspace *.xcworkspace \
-          -scheme UltraBotV3 \
+          -scheme tempApp \
           -sdk iphoneos \
           -configuration Release \
           archive \
