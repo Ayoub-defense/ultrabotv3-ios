@@ -1,0 +1,51 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Install pods
+        run: cd ios && pod install
+
+      - name: Build iOS
+        run: |
+          cd ios
+          xcodebuild -workspace *.xcworkspace \
+          -scheme UltraBotV3 \
+          -sdk iphoneos \
+          -configuration Release \
+          archive \
+          -archivePath build/UltraBotV3.xcarchive
+
+      - name: Export IPA
+        run: |
+          cd ios
+          xcodebuild -exportArchive \
+          -archivePath build/UltraBotV3.xcarchive \
+          -exportOptionsPlist ExportOptions.plist \
+          -exportPath build
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: UltraBotV3-IPA
+          path: ios/build/*.ipa
