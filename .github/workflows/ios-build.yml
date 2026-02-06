@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
           xcodebuild \
             -workspace tempApp.xcworkspace \
             -scheme tempApp \
-            -sdk iphoneos17.5 \
+            -sdk iphoneos \
             -configuration Release \
             -archivePath build/UltraBotV3.xcarchive \
             archive \
