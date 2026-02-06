@@ -1,0 +1,12 @@
+<key>UIBackgroundModes</key>
+<array>
+  <string>fetch</string>
+  <string>processing</string>
+  <string>audio</string>
+</array>
+
+<key>NSMotionUsageDescription</key>
+<string>Antivol par mouvement</string>
+
+<key>NSLocalNetworkUsageDescription</key>
+<string>Analyse réseau locale</string>

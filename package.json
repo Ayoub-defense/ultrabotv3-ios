@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "react-native": "^0.83.1",
+    "react-native-sqlite-storage": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.13",
+    "@types/react-native": "^0.72.8"
+  }
+}
