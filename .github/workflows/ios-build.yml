@@ -7,10 +7,13 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-13
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Select stable Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
       - name: Install Node
         uses: actions/setup-node@v4
@@ -23,26 +26,32 @@ jobs:
       - name: Install CocoaPods
         run: sudo gem install cocoapods
 
-      - name: Install pods
-        run: cd ios && pod install
-
-      - name: Build iOS
+      - name: Install Pods
         run: |
           cd ios
-          xcodebuild -workspace *.xcworkspace \
-          -scheme tempApp \
-          -sdk iphoneos \
-          -configuration Release \
-          archive \
-          -archivePath build/UltraBotV3.xcarchive
+          pod install
+
+      - name: Build iOS archive
+        run: |
+          cd ios
+          xcodebuild \
+            -workspace tempApp.xcworkspace \
+            -scheme tempApp \
+            -sdk iphoneos17.5 \
+            -configuration Release \
+            -archivePath build/UltraBotV3.xcarchive \
+            archive \
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Export IPA
         run: |
           cd ios
-          xcodebuild -exportArchive \
-          -archivePath build/UltraBotV3.xcarchive \
-          -exportOptionsPlist ExportOptions.plist \
-          -exportPath build
+          xcodebuild \
+            -exportArchive \
+            -archivePath build/UltraBotV3.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build \
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
