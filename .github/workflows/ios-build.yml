@@ -10,15 +10,16 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Install Node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install JS deps
+        run: npm ci
 
       - name: Install CocoaPods
         run: sudo gem install cocoapods
@@ -26,9 +27,12 @@ jobs:
       - name: Install Pods
         run: |
           cd ios
-          pod install
+          pod install --repo-update
 
-      - name: Build iOS archive
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build Archive
         run: |
           cd ios
           xcodebuild \
@@ -37,18 +41,33 @@ jobs:
             -sdk iphoneos \
             -configuration Release \
             -archivePath build/UltraBotV3.xcarchive \
-            archive \
-            CODE_SIGNING_ALLOWED=NO
+            clean archive
 
       - name: Export IPA
         run: |
           cd ios
-          xcodebuild \
-            -exportArchive \
+          cat > ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+          "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>development</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>stripSwiftSymbols</key>
+              <true/>
+              <key>compileBitcode</key>
+              <false/>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild -exportArchive \
             -archivePath build/UltraBotV3.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath build \
-            CODE_SIGNING_ALLOWED=NO
+            -exportPath build
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
